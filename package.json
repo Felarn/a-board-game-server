@@ -16,7 +16,12 @@
     "url": "https://github.com/Felarn/a-board-game-server/issues"
   },
   "homepage": "https://github.com/Felarn/a-board-game-server#readme",
+  "devDependencies": {
+    "eslint": "^9.4.0",
+    "nodemon": "^3.1.2"
+  },
   "dependencies": {
-    "eslint": "^9.4.0"
+    "uuid": "^9.0.1",
+    "ws": "^8.17.0"
   }
 }
