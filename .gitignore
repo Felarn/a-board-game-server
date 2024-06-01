@@ -1,1 +1,4 @@
 /node_modules/
+developement.config
+production.config
+.vscode/
