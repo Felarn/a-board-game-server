@@ -1,0 +1,22 @@
+{
+  "name": "a-board-game-server",
+  "version": "0.0.1",
+  "description": "backend server for summer practice of Hexlet college. 4th semester.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Felarn/a-board-game-server.git"
+  },
+  "author": "Felarn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Felarn/a-board-game-server/issues"
+  },
+  "homepage": "https://github.com/Felarn/a-board-game-server#readme",
+  "dependencies": {
+    "eslint": "^9.4.0"
+  }
+}
