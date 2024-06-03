@@ -1,13 +1,50 @@
+import parseMessage from "../utils/parseMessage.js";
+
 export default class {
-  constructor(userID, connection, server) {
+  constructor(connection, server) {
     this.server = server;
     this.state = "outOfGame";
-    this.userID = userID;
-    this.connection = connection;
+    this.userID = crypto.randomUUID();
+    this.connectionStatus = "online";
+    this.userName = "Anon";
+    this.game = null;
+    this.playerSide = null;
+    this.bindConnection(connection);
     this.userRegistered();
 
-    this.connection.on("message", (data) => {});
-    console.log(userID + " created");
+    console.log(this.userID + " created");
+  }
+
+  send(action, payload = null) {
+    this.connection.send(JSON.stringify({ action, payload }));
+  }
+
+  getID() {
+    return this.userID;
+  }
+
+  getState() {
+    return this.state;
+  }
+
+  getConnectionStatus() {
+    return this.connectionStatus;
+  }
+
+  getName() {
+    return this.userName;
+  }
+
+  getSide() {
+    return this.playerSide;
+  }
+
+  getPublicInfo() {
+    return {
+      userName: this.getName(),
+      side: this.getSide(),
+      connectionStatus: this.getConnectionStatus(),
+    };
   }
 
   chatMessage(message) {
@@ -22,42 +59,53 @@ export default class {
     this.send("registered", { userID: this.userID });
   }
 
-  send(action, payload = null) {
-    this.connection.send(JSON.stringify({ action, payload }));
-  }
-
   reattachConnection(connection) {
-    this.connection = connection;
+    this.bindConnection(connection);
+    this.changeConnectionStatus("online");
+    this.send("identified", { userName: this.userName, state: this.state });
   }
 
-  actions = {
-    outOfGame: {
-      createGame: (payload) => {},
-      join: (payload) => {},
-      rename: (payload) => {},
-    },
+  joinGame(gameID) {
+    console.log("gameID:" + gameID);
+    const gameToConnect = this.server.games[gameID];
+    console.log("aaalll of the games:    ===================");
+    console.log(this.server.games);
+    if (gameToConnect) {
+      gameToConnect.addPlayer(this);
+      this.game = gameToConnect;
+    }
+  }
 
-    inLobby: {
-      rename: (payload) => {},
-      leave: (payload) => {},
-      pickSide: (payload) => {},
-      startMatch: (payload) => {},
-      chat: (payload) => {},
-    },
+  leaveGame(gameID) {
+    if (this.game === null) throw new Error("Not in the game");
+    this.game.removePlayer(this);
+    this.game = null;
+  }
 
-    inGameMakingMove: {
-      turn: (payload) => {},
-      surrender: (payload) => {},
-      chat: (payload) => {},
-    },
+  rename(newName) {
+    this.userName = newName;
+  }
 
-    inGameSpectating: {
-      surrender: (payload) => {},
-      chat: (payload) => {},
-    },
-  };
+  printInfo() {
+    console.log("ID: " + this.getID());
+    console.log("userName: " + this.getName());
+    console.log("userName: " + this.state);
+  }
 
-  act({ action, payload }) {
+  privateInfoString() {
+    return `${this.getID()}: ${this.getName()} | STATE: ${this.getState()} | CONNECTION: ${this.getConnectionStatus()} | STATE: ${this.getState()}`;
+  }
+
+  publicInfoString() {
+    return `NAME: ${this.getName()} | STATE: ${this.getState()} | CONNECTION: ${this.getConnectionStatus()} | SIDE: ${this.getSide()}`;
+  }
+
+  changeConnectionStatus(newStatus) {
+    this.connectionStatus = newStatus;
+    if (newStatus === "offline") this.connection = null;
+  }
+
+  act(action, payload = null) {
     if (this.actions[this.state][action])
       this.actions[this.state][action](payload);
   }
@@ -66,4 +114,84 @@ export default class {
     if (newState in this.actions) this.state = newState;
     else throw new Error(`State : ${newState} does not exist`);
   }
+
+  bindConnection(connection) {
+    this.connection = connection;
+    this.connection.on("message", (data) => {
+      const { action, payload } = parseMessage(data);
+      this.act(action, payload);
+    });
+
+    this.connection.on("close", (data) => {
+      console.log("connection closed with " + this.getID());
+      this.act("disconnect");
+    });
+
+    this.connection.on("error", (data) => {
+      console.log("connection lost with " + this.getID());
+      this.act("disconnect");
+    });
+  }
+
+  actions = {
+    outOfGame: {
+      createGame: (payload) => {
+        console.log("starting new game");
+        const gameID = this.server.createNewGame(this);
+        this.joinGame(gameID);
+        this.changeState("inLobby");
+      },
+      join: (payload) => {
+        console.log("joining");
+        this.joinGame(payload.gameID);
+        this.changeState("inLobby");
+      },
+      rename: (payload) => {
+        this.rename(payload.userName);
+      },
+      disconnect: (payload) => {
+        this.changeConnectionStatus("offline");
+        this.changeState("outOfGame");
+      },
+    },
+
+    inLobby: {
+      rename: (payload) => {
+        this.rename(payload.userName);
+      },
+      leave: (payload) => {
+        this.leaveGame();
+        this.changeState("outOfGame");
+      },
+      pickSide: (payload) => {},
+      startMatch: (payload) => {},
+      chat: (payload) => {},
+      disconnect: (payload) => {
+        this.leaveGame();
+        this.changeState("outOfGame");
+        this.changeConnectionStatus("offline");
+      },
+    },
+
+    inGameMakingMove: {
+      win: (payload) => {},
+      draw: (payload) => {},
+      turn: (payload) => {},
+      surrender: (payload) => {},
+      chat: (payload) => {},
+      disconnect: (payload) => {
+        this.changeConnectionStatus("offline");
+        // оповестить игроков о потере соединения
+      },
+    },
+
+    inGameSpectating: {
+      surrender: (payload) => {},
+      chat: (payload) => {},
+      disconnect: (payload) => {
+        this.changeConnectionStatus("offline");
+        // оповестить игроков о потере соединения
+      },
+    },
+  };
 }

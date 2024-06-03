@@ -11,16 +11,45 @@ export default class {
     return userID in this.users;
   }
 
-  newUser(connection) {
-    const userID = crypto.randomUUID();
-    this.users[userID] = new User(userID, connection, this);
-    this.users[userID].debugMessage();
-    console.log("users: ==============================");
-    console.log(this.users);
+  createUser(connection) {
+    const newUser = new User(connection, this);
+    const userID = newUser.getID();
+    this.users[userID] = newUser;
+    this.printUsers();
   }
 
   reconnectUser(userID, newConnection) {
     this.users[userID].reattachConnection(newConnection);
+    console.log("reconneced " + userID);
+    this.printUsers();
+  }
+
+  createNewGame(host) {
+    const newGame = new Game(this, host);
+    const gameID = newGame.getID();
+    this.games[gameID] = newGame;
+    // this.printGames();
+    return gameID;
+  }
+
+  deleteGame(gameID) {
+    delete this.games[gameID];
+    this.printGames();
+  }
+
+  printGames() {
+    console.log("=========== GAMES  ===================");
+    // console.log(Object.keys(this.games));
+    Object.values(this.games).forEach((game) => {
+      game.printInfo();
+    });
+  }
+
+  printUsers() {
+    console.log("===========  USERS  ===================");
+    console.log(
+      Object.values(this.users).map((user) => user.privateInfoString())
+    );
   }
 
   // actions = {
