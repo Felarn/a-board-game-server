@@ -1,9 +1,11 @@
+import { v4 as generateID } from "uuid";
 export default class {
   constructor(server, host) {
     this.server = server;
     this.players = [];
     this.host = host;
-    this.gameID = crypto.randomUUID();
+    // this.gameID = crypto.randomUUID();
+    this.gameID = generateID();
     this.gameName = "AnonRoom";
   }
 

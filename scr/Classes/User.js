@@ -1,10 +1,11 @@
 import parseMessage from "../utils/parseMessage.js";
-
+import { v4 as generateID } from "uuid";
 export default class {
   constructor(connection, userName = "Anon", server) {
     this.server = server;
     this.state = "outOfGame";
-    this.userID = crypto.randomUUID();
+    // this.userID = crypto.randomUUID();
+    this.userID = generateID();
     this.connectionStatus = "online";
     this.userName = userName;
     this.game = null;
