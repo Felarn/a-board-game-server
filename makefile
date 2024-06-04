@@ -8,10 +8,10 @@ start:
 	node index.js
 
 install:
-	npm -ci
+	npm ci
 
 deploy:
 	rm -f production.config
 	rm -f developement.config
 	echo "{\n\t\"port\":80\n}" >> production.config
-	npm -ci
+	npm ci
