@@ -16,7 +16,7 @@ wss.on("connection", (newConnection) => {
     const { action, payload } = parseMessage(message);
     console.log("\x1b[36m" + action + ":");
     console.log(payload);
-    if (action === "registration") serverApp.createUser(newConnection);
+    if (action === "registration") serverApp.createUser(newConnection, payload);
     if (action === "identification")
       if (serverApp.isUserExist(payload.userID)) {
         serverApp.reconnectUser(payload.userID, newConnection);
@@ -24,7 +24,7 @@ wss.on("connection", (newConnection) => {
         newConnection.send(
           JSON.stringify({ action: "error", payload: "wrongID" })
         );
-        serverApp.createUser(newConnection);
+        serverApp.createUser(newConnection, payload);
       }
   });
 });

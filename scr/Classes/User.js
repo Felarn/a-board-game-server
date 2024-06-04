@@ -1,12 +1,12 @@
 import parseMessage from "../utils/parseMessage.js";
 
 export default class {
-  constructor(connection, server) {
+  constructor(connection, userName = "Anon", server) {
     this.server = server;
     this.state = "outOfGame";
     this.userID = crypto.randomUUID();
     this.connectionStatus = "online";
-    this.userName = "Anon";
+    this.userName = userName;
     this.game = null;
     this.playerSide = null;
     this.bindConnection(connection);
@@ -16,7 +16,8 @@ export default class {
   }
 
   send(action, payload = null) {
-    this.connection.send(JSON.stringify({ action, payload }));
+    if (this.connection)
+      this.connection.send(JSON.stringify({ action, payload }));
   }
 
   getID() {
@@ -47,8 +48,12 @@ export default class {
     };
   }
 
-  chatMessage(message) {
-    this.send("chat", message);
+  receiveChat(message, from) {
+    this.send("chat", { message, from });
+  }
+
+  sendChat(message) {
+    this.game.sendChatToEveryone(message, this.getName());
   }
 
   debugMessage(message) {
@@ -62,7 +67,10 @@ export default class {
   reattachConnection(connection) {
     this.bindConnection(connection);
     this.changeConnectionStatus("online");
-    this.send("identified", { userName: this.userName, state: this.state });
+    this.send("identified", {
+      userName: this.userName,
+      userCondition: this.state,
+    });
   }
 
   joinGame(gameID) {
@@ -78,6 +86,7 @@ export default class {
 
   leaveGame(gameID) {
     if (this.game === null) throw new Error("Not in the game");
+    this.game.informEveryone(`Игрок ${this.getName()} покинул в комнату`);
     this.game.removePlayer(this);
     this.game = null;
   }
@@ -93,7 +102,7 @@ export default class {
   }
 
   privateInfoString() {
-    return `${this.getID()}: ${this.getName()} | STATE: ${this.getState()} | CONNECTION: ${this.getConnectionStatus()} | STATE: ${this.getState()}`;
+    return `${this.getID()}: ${this.getName()} | STATE: ${this.getState()} | CONNECTION: ${this.getConnectionStatus()}`;
   }
 
   publicInfoString() {
@@ -111,11 +120,14 @@ export default class {
   }
 
   changeState(newState) {
-    if (newState in this.actions) this.state = newState;
-    else throw new Error(`State : ${newState} does not exist`);
+    if (newState in this.actions) {
+      this.state = newState;
+      this.send("newState", { userCondition: this.state });
+    } else throw new Error(`State : ${newState} does not exist`);
   }
 
   bindConnection(connection) {
+    clearTimeout(this.disconnectionTimer);
     this.connection = connection;
     this.connection.on("message", (data) => {
       const { action, payload } = parseMessage(data);
@@ -124,12 +136,12 @@ export default class {
 
     this.connection.on("close", (data) => {
       console.log("connection closed with " + this.getID());
-      this.act("disconnect");
+      this.disconnectionTimer = setTimeout(() => this.act("disconnect"), 2000);
     });
 
     this.connection.on("error", (data) => {
       console.log("connection lost with " + this.getID());
-      this.act("disconnect");
+      this.disconnectionTimer = setTimeout(() => this.act("disconnect"), 2000);
     });
   }
 
@@ -159,13 +171,16 @@ export default class {
       rename: (payload) => {
         this.rename(payload.userName);
       },
+      renameGame: (payload) => {},
       leave: (payload) => {
         this.leaveGame();
         this.changeState("outOfGame");
       },
       pickSide: (payload) => {},
       startMatch: (payload) => {},
-      chat: (payload) => {},
+      chat: (payload) => {
+        this.sendChat(payload.message);
+      },
       disconnect: (payload) => {
         this.leaveGame();
         this.changeState("outOfGame");
@@ -178,7 +193,9 @@ export default class {
       draw: (payload) => {},
       turn: (payload) => {},
       surrender: (payload) => {},
-      chat: (payload) => {},
+      chat: (payload) => {
+        this.sendChat(payload.message);
+      },
       disconnect: (payload) => {
         this.changeConnectionStatus("offline");
         // оповестить игроков о потере соединения
@@ -187,7 +204,9 @@ export default class {
 
     inGameSpectating: {
       surrender: (payload) => {},
-      chat: (payload) => {},
+      chat: (payload) => {
+        this.sendChat(payload.message);
+      },
       disconnect: (payload) => {
         this.changeConnectionStatus("offline");
         // оповестить игроков о потере соединения

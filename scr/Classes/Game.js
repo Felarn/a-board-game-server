@@ -4,6 +4,7 @@ export default class {
     this.players = [];
     this.host = host;
     this.gameID = crypto.randomUUID();
+    this.gameName = "AnonRoom";
   }
 
   updatePlayersOnChange() {
@@ -17,7 +18,11 @@ export default class {
 
   addPlayer(user) {
     this.players.push(user);
-    // оповестить игроков об изменениях в комнате
+    this.informEveryone(`Игрок ${user.getName()} вошёл в комнату`);
+    user.receiveChat(
+      `Вы присоединилсь к комнате "${this.getGameName()}", ID: (${this.getID()})"`,
+      "Server"
+    );
     this.server.printGames();
   }
 
@@ -33,8 +38,20 @@ export default class {
     );
   }
 
+  informEveryone(message) {
+    this.sendChatToEveryone(message, "Server");
+  }
+
+  sendChatToEveryone(message, from) {
+    this.players.forEach((player) => player.receiveChat(message, from));
+  }
+
   getID() {
     return this.gameID;
+  }
+
+  getGameName() {
+    return this.gameName;
   }
 
   turn() {}
