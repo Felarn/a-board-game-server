@@ -115,8 +115,12 @@ export default class {
   }
 
   act(action, payload = null) {
-    if (this.actions[this.state][action])
-      this.actions[this.state][action](payload);
+    try {
+      if (this.actions[this.state][action])
+        this.actions[this.state][action](payload);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   changeState(newState) {
