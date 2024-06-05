@@ -1,5 +1,8 @@
+import formatAndSend from "../utils/formatAndSend.js";
 import parseMessage from "../utils/parseMessage.js";
 import { v4 as generateID } from "uuid";
+import sendError from "../utils/sendError.js";
+
 export default class {
   constructor(connection, userName = "Anon", server) {
     this.server = server;
@@ -17,8 +20,7 @@ export default class {
   }
 
   send(action, payload = null) {
-    if (this.connection)
-      this.connection.send(JSON.stringify({ action, payload }));
+    if (this.connection) formatAndSend(this.connection, action, payload);
   }
 
   getID() {
@@ -86,7 +88,8 @@ export default class {
   }
 
   leaveGame(gameID) {
-    if (this.game === null) throw new Error("Not in the game");
+    if (this.game === null)
+      throw new Error("Can't leave. Not currently in the game");
     this.game.informEveryone(`Игрок ${this.getName()} покинул в комнату`);
     this.game.removePlayer(this);
     this.game = null;
@@ -120,7 +123,7 @@ export default class {
       if (this.actions[this.state][action])
         this.actions[this.state][action](payload);
     } catch (error) {
-      console.log(error);
+      sendError(this.connection, error);
     }
   }
 

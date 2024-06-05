@@ -1,4 +1,8 @@
 export default (message) => {
-  const data = JSON.parse(message);
-  return data;
+  try {
+    const data = JSON.parse(message);
+    return data;
+  } catch (e) {
+    throw new Error("Incorrect message format, should be JSON");
+  }
 };
