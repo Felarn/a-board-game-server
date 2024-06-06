@@ -1,4 +1,4 @@
-# a-board-game-server
+# Hexlet Chess Server
 
 Серверная часть работы на летнюю практику Hexlet колледжа
 
