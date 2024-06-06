@@ -33,17 +33,20 @@ make start
 Для подключения к вебсокету из скрипта, запущенного в браузере достаточно следующего кода
 
 ```
-const serverURL = "ws://localhost:4444";
-// const serverURL = "ws://felarn.ru";
+// const serverURL = "ws://localhost:4444"; // для подключения к локальному серверу
+const serverURL = "wss://felarn.ru"; // для подключения к online-серверу
 const connection = new WebSocket(serverURL);
 
-connection.onopen = () => {
+connection.onopen = () => {  // событие при установке соединения с сервером он должен отправить сообщение: '{"action":"debug","payload":{"message":"You've connected to Hexlet Chess server"}}'
   console.log("WebSocket connection established");
-  connection.send("hello");
+  connection.send("hello"); // отправка сообщения. Сервер должен будет ответить:
+// 'Hi from Hexlet Chess
+// You shold use {acton: %command name%, payload: {%data object%}} format 
+// to communicate with this server'
 };
 
-connection.onmessage = (message) => {
-  console.log(message.data);
+connection.onmessage = (message) => { // слушатель событий, все ответы сервера проходят через него
+  console.log(message.data); // в консоль должны будут вывестись ответы на полключение и send("hello")
 };
 ```
 
