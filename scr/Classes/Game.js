@@ -1,4 +1,5 @@
 import { v4 as generateID } from "uuid";
+// import sendError from "../utils/sendError.js";
 export default class {
   constructor(server, host, gameName = `${host.getName()}\`s board`) {
     this.server = server;
@@ -8,10 +9,35 @@ export default class {
     this.gameID = generateID();
     this.gameName = gameName;
     this.openGame = true;
+    this.gameHistory = [];
+    this.black = null;
+    this.white = null;
+    this.spectator = null; // заглушка для единообразия, обращений к ней быть не должно
+    this.activePlayer = null;
+  }
+  isSideAvailable(side) {
+    return side === "spectator" || this[side] === null;
   }
 
-  updatePlayersOnChange() {
+  assignPlayerSide(player, side) {
+    console.log(player.getSide());
+    this[player.getSide()] = null;
+    this[side] = player;
+    player.setSide(side);
+    this.updateLobbyState();
+  }
+
+  updateLobbyState() {
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
+  }
+
+  startMatch() {
+    if (this.black && this.white) {
+      this.activePlayer = this.white;
+      this.players.forEach((player) => player.changeState("inGame"));
+    } else {
+      this.informEveryone("нужно 2 игрока");
+    }
   }
 
   getID() {
@@ -34,7 +60,7 @@ export default class {
     return this.openGame;
   }
 
-  getPlayerList() {
+  getPlayerInfoList() {
     const list = this.players.map((player) => player.getPublicInfo());
     return list;
   }
@@ -75,7 +101,26 @@ export default class {
     return this.gameName;
   }
 
-  turn() {}
+  toggleActivePlayer() {
+    this.activePlayer === this.white
+      ? (this.activePlayer = this.black)
+      : (this.activePlayer = this.white);
+  }
+
+  isActivePlayer(player) {
+    return this.activePlayer === player;
+  }
+
+  turn(gameState) {
+    this.gameHistory.push(gameState);
+    this.toggleActivePlayer();
+    this.players.forEach((player) => player.act("getGameState"));
+    this.players.forEach((player) => player.sendRightsToMove());
+  }
+
+  getLastGameState() {
+    return this.gameHistory.at(-1);
+  }
 
   getGameInfo() {
     const info = {

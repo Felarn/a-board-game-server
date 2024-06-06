@@ -15,12 +15,21 @@ export default class {
     this.playerSide = null;
     this.bindConnection(connection);
     this.userRegistered();
+    this.side = "spectator";
 
     console.log(this.userID + " created");
   }
 
   send(action, payload = null) {
     if (this.connection) formatAndSend(this.connection, action, payload);
+  }
+
+  setSide(side) {
+    this.side = side;
+  }
+
+  getSide() {
+    return this.side;
   }
 
   getID() {
@@ -37,10 +46,6 @@ export default class {
 
   getName() {
     return this.userName;
-  }
-
-  getSide() {
-    return this.playerSide;
   }
 
   getPublicInfo() {
@@ -132,7 +137,7 @@ export default class {
   changeState(newState) {
     if (newState in this.actions) {
       this.state = newState;
-      this.send("newState", { userCondition: this.state });
+      this.send("newUserCondition", { userCondition: this.state });
       this.server.updateOpenGamesList();
     } else throw new Error(`State : ${newState} does not exist`);
   }
@@ -154,6 +159,11 @@ export default class {
       console.log("connection lost with " + this.getID());
       this.disconnectionTimer = setTimeout(() => this.act("disconnect"), 2000);
     });
+  }
+
+  sendRightsToMove() {
+    if (this.game.isActivePlayer(this)) this.send("yourTurn");
+    else this.send("wait");
   }
 
   actions = {
@@ -190,8 +200,14 @@ export default class {
         this.leaveGame();
         this.changeState("outOfGame");
       },
-      pickSide: (payload) => {},
-      startMatch: (payload) => {},
+      pickSide: ({ side }) => {
+        if (this.game.isSideAvailable(side)) {
+          this.game.assignPlayerSide(this, side);
+        } else this.receiveChat("сторона недоступна", "server");
+      },
+      startMatch: (payload) => {
+        this.game.startMatch();
+      },
       chat: (payload) => {
         this.sendChat(payload.message);
       },
@@ -202,10 +218,16 @@ export default class {
       },
     },
 
-    inGameMakingMove: {
+    inGame: {
+      getGameState: () => {
+        this.send("gameState", this.game.getLastGameState());
+      },
       win: (payload) => {},
       draw: (payload) => {},
-      turn: (payload) => {},
+      makeTurn: (payload) => {
+        if (this.game.isActivePlayer(this)) this.game.turn(payload);
+        else this.receiveChat("не твой ход", "server");
+      },
       surrender: (payload) => {},
       chat: (payload) => {
         this.sendChat(payload.message);
@@ -216,15 +238,15 @@ export default class {
       },
     },
 
-    inGameSpectating: {
-      surrender: (payload) => {},
-      chat: (payload) => {
-        this.sendChat(payload.message);
-      },
-      disconnect: (payload) => {
-        this.changeConnectionStatus("offline");
-        // оповестить игроков о потере соединения
-      },
-    },
+    // inGameSpectating: {
+    //   surrender: (payload) => {},
+    //   chat: (payload) => {
+    //     this.sendChat(payload.message);
+    //   },
+    //   disconnect: (payload) => {
+    //     this.changeConnectionStatus("offline");
+    //     // оповестить игроков о потере соединения
+    //   },
+    // },
   };
 }
