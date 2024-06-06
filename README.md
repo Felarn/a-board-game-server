@@ -32,7 +32,7 @@ make start
 
 Для подключения к вебсокету из скрипта, запущенного в браузере достаточно следующего кода
 
-```
+```js
 // const serverURL = "ws://localhost:4444"; // для подключения к локальному серверу
 const serverURL = "wss://felarn.ru"; // для подключения к online-серверу
 const connection = new WebSocket(serverURL);
@@ -54,7 +54,7 @@ connection.onmessage = (message) => { // слушатель событий, вс
 
 формат сообщений для общения с сервером JSON
 структура объекта, который ожидает и отправляет сервер следующая:
-```
+```JSON
 {
 action:'%имя команды%',
 payload:
