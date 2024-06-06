@@ -1,11 +1,41 @@
 import Game from "./Game.js";
 import User from "./User.js";
 
-
 export default class {
   constructor() {
     this.games = {};
     this.users = {};
+    this.openGamesList = [];
+    this.outOfGameUsers = this.users;
+  }
+
+  getAllGames() {
+    return Object.values(this.games);
+  }
+
+  updateOpenGamesList() {
+    const newList = this.getAllGames().reduce((list, game) => {
+      if (game.isOpen()) {
+        list.push(game.getGameInfo());
+      }
+      return list;
+    }, []);
+    this.openGamesList = newList;
+    this.sendOpenGamesListToUsers();
+  }
+
+  sendOpenGamesListToUsers() {
+    this.getUsersOutOfGame().forEach((user) => user.act("sendOpenGamesList"));
+  }
+
+  // printGames;
+
+  getUsersOutOfGame() {
+    return Object.values(this.outOfGameUsers); // сейчас это все доступные пользователи
+  }
+
+  getOpenGamesList() {
+    return this.openGamesList;
   }
 
   isUserExist(userID) {
@@ -52,27 +82,4 @@ export default class {
       Object.values(this.users).map((user) => user.privateInfoString())
     );
   }
-
-  // actions = {
-  //   idle: {
-  //     registration: (payload) => {
-  //       this.newUser;
-  //     },
-  //     identification: (payload) => {
-  //       this.reconnectUser(payload.userID);
-  //     },
-  //   },
-  // };
-
-  // state = "idle";
-
-  // act({ action, payload }) {
-  //   if (this.actions[this.state][action])
-  //     this.actions[this.state][action](payload);
-  // }
-
-  // changeState(newState) {
-  //   if (newState in this.actions) this.state = newState;
-  //   else throw new Error(`State : ${newState} does not exist`);
-  // }
 }

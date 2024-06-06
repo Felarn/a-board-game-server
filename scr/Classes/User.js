@@ -65,6 +65,7 @@ export default class {
 
   userRegistered() {
     this.send("registered", { userID: this.userID });
+    this.act("sendOpenGamesList");
   }
 
   reattachConnection(connection) {
@@ -74,6 +75,7 @@ export default class {
       userName: this.userName,
       userCondition: this.state,
     });
+    this.act("sendOpenGamesList");
   }
 
   joinGame(gameID) {
@@ -131,6 +133,7 @@ export default class {
     if (newState in this.actions) {
       this.state = newState;
       this.send("newState", { userCondition: this.state });
+      this.server.updateOpenGamesList();
     } else throw new Error(`State : ${newState} does not exist`);
   }
 
@@ -155,6 +158,9 @@ export default class {
 
   actions = {
     outOfGame: {
+      sendOpenGamesList: (payload) => {
+        this.send("roomsList", this.server.getOpenGamesList());
+      },
       createGame: (payload) => {
         console.log("starting new game");
         const gameID = this.server.createNewGame(this);

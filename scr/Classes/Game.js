@@ -1,16 +1,37 @@
 import { v4 as generateID } from "uuid";
 export default class {
-  constructor(server, host) {
+  constructor(server, host, gameName = `${host.getName()}\`s board`) {
     this.server = server;
     this.players = [];
     this.host = host;
     // this.gameID = crypto.randomUUID();
     this.gameID = generateID();
-    this.gameName = "AnonRoom";
+    this.gameName = gameName;
+    this.openGame = true;
   }
 
   updatePlayersOnChange() {
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
+  }
+
+  getID() {
+    return this.gameID;
+  }
+
+  getGameName() {
+    return this.gameName;
+  }
+
+  getPlayerCount() {
+    return this.players.length;
+  }
+
+  getHostName() {
+    return this.host.getName();
+  }
+
+  isOpen() {
+    return this.openGame;
   }
 
   getPlayerList() {
@@ -26,11 +47,13 @@ export default class {
       "Server"
     );
     this.server.printGames();
+    this.server.updateOpenGamesList();
   }
 
   removePlayer(user) {
     this.players = this.players.filter((player) => player !== user);
-    if (this.players.length === 0) this.server.deleteGame(this.getID());
+    if (this.getPlayerCount() === 0) this.server.deleteGame(this.getID());
+    // this.server.updateOpenGamesList();
   }
 
   printInfo() {
@@ -48,13 +71,19 @@ export default class {
     this.players.forEach((player) => player.receiveChat(message, from));
   }
 
-  getID() {
-    return this.gameID;
-  }
-
   getGameName() {
     return this.gameName;
   }
 
   turn() {}
+
+  getGameInfo() {
+    const info = {
+      gameID: this.getID(),
+      gameName: this.getGameName(),
+      hostName: this.getHostName(),
+      playerCount: this.getPlayerCount(),
+    };
+    return info;
+  }
 }

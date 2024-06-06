@@ -2,7 +2,6 @@ import ServerApp from "./scr/Classes/serverApp.js";
 import loadConfig from "./scr/utils/loadConfig.js";
 import { WebSocketServer } from "ws";
 import parseMessage from "./scr/utils/parseMessage.js";
-// import basicInteractions from "./scr/utils/basicInteractions.js";
 import formatAndSend from "./scr/utils/formatAndSend.js";
 import sendError from "./scr/utils/sendError.js";
 
