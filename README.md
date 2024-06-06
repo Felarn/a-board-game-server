@@ -89,7 +89,7 @@ payload:
 {action: "newState", payload: { userCondition: userCondition }}
 ```
 userCondition может принимать следующие значения:
-'outOfGame' - главное меню
-'inLobby' - в лобби, фаза подготовки игры
-'inGame' - находится в матче
-('resultScreen' - находится на экране с результатом матча) стоит обсудить
+*'outOfGame' - главное меню
+*'inLobby' - в лобби, фаза подготовки игры
+*'inGame' - находится в матче
+*('resultScreen' - находится на экране с результатом матча) стоит обсудить
