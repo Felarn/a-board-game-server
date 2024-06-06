@@ -54,7 +54,7 @@ connection.onmessage = (message) => { // слушатель событий, вс
 
 формат сообщений для общения с сервером JSON
 структура объекта, который ожидает и отправляет сервер следующая:
-```JSON
+```js
 {
 action:'%имя команды%',
 payload:
@@ -66,21 +66,21 @@ payload:
 ## команды серверу
 
 ### вход в комнату 
-```
+```js
 {action: "join", payload: { gameID: gameID }}
 ```
 от сервера прийдет 
-```
+```js
 {action: "newState", payload: { userCondition: "inLobby" }}
 ```
 Позже добавлю, что вместе с этим прилетит второе сообщение с содержимым комнаты (игроки, ID, название комнаты)
 
 ### выход из комнаты 
-```
+```js
 {action: "leave", payload: null} или просто {action: "leave"}
 ```
 в ответ сервер пришлет 
-```
+```js
 {action: "newState", payload: { userCondition: "outOfGame" }}
 ```
 
@@ -88,7 +88,7 @@ payload:
 
 ### Изменение "страницы"
 Оповещение игрока о том, что он "вышел в главное меню"/"зашел в комнату"/"начал матч"/"перешел на финальный экран"
-```
+```js
 {action: "newState", payload: { userCondition: userCondition }}
 ```
 userCondition может принимать следующие значения:
