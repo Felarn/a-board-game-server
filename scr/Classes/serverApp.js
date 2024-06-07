@@ -35,7 +35,7 @@ export default class {
   }
 
   getOpenGamesList() {
-    return this.openGamesList;
+    return this.openGamesList.reverse();
   }
 
   isUserExist(userID) {
