@@ -14,13 +14,18 @@ export default class {
     this.white = null;
     this.spectator = null; // заглушка для единообразия, обращений к ней быть не должно
     this.activePlayer = null;
+    this.gamePhase = "inLobby";
   }
+
+  actEveryone(action) {
+    this.players.forEach((player) => player.act(action));
+  }
+
   isSideAvailable(side) {
     return side === "spectator" || this[side] === null;
   }
 
   assignPlayerSide(player, side) {
-    console.log(player.getSide());
     this[player.getSide()] = null;
     this[side] = player;
     player.setSide(side);
@@ -31,10 +36,21 @@ export default class {
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
   }
 
-  startMatch() {
+  changeGamePhase(newPhase) {
+    this.gamePhase = newPhase;
+  }
+  getGamePhase() {
+    return this.gamePhase;
+  }
+
+  startMatch(payload) {
     if (this.black && this.white) {
+      this.gameHistory.push(payload);
       this.activePlayer = this.white;
-      this.players.forEach((player) => player.changeState("inGame"));
+      this.changeGamePhase("inGame");
+      this.players.forEach((player) => player.changeState(this.getGamePhase()));
+      this.actEveryone("sendGameState");
+      this.actEveryone("sendTurnState");
     } else {
       this.informEveryone("нужно 2 игрока");
     }
@@ -114,8 +130,8 @@ export default class {
   turn(gameState) {
     this.gameHistory.push(gameState);
     this.toggleActivePlayer();
-    this.players.forEach((player) => player.act("getGameState"));
-    this.players.forEach((player) => player.sendRightsToMove());
+    this.actEveryone("sendGameState");
+    this.actEveryone("sendTurnState");
   }
 
   getLastGameState() {

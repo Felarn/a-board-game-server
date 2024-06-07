@@ -123,7 +123,7 @@ WIP
 ```
 от сервера прийдет 
 ```js
-{action: "newState", payload: { userCondition: "inLobby" }}
+{action: "newUserCondition", payload: { userCondition: "inLobby" }}
 ```
 Позже добавлю, что вместе с этим прилетит второе сообщение с содержимым комнаты (игроки, ID, название комнаты)
 
@@ -133,7 +133,7 @@ WIP
 ```
 в ответ сервер пришлет 
 ```js
-{action: "newState", payload: { userCondition: "outOfGame" }}
+{action: "newUserCondition", payload: { userCondition: "outOfGame" }}
 ```
 
 ## сообщения от сервера
@@ -141,7 +141,7 @@ WIP
 ### Изменение "страницы"
 Оповещение игрока о том, что он "вышел в главное меню"/"зашел в комнату"/"начал матч"/"перешел на финальный экран"
 ```js
-{action: "newState", payload: { userCondition: userCondition }}
+{action: "newUserCondition", payload: { userCondition: userCondition }}
 ```
 userCondition может принимать следующие значения:
 * 'outOfGame' - главное меню

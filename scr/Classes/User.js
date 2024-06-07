@@ -26,6 +26,7 @@ export default class {
 
   setSide(side) {
     this.side = side;
+    this.send("yourSide", { side: this.getSide() });
   }
 
   getSide() {
@@ -46,6 +47,10 @@ export default class {
 
   getName() {
     return this.userName;
+  }
+
+  isYourTurn() {
+    return this.game.activePlayer === this;
   }
 
   getPublicInfo() {
@@ -80,7 +85,10 @@ export default class {
       userName: this.userName,
       userCondition: this.state,
     });
+    this.send("yourSide", { side: this.getSide() });
     this.act("sendOpenGamesList");
+    this.act("sendGameState");
+    this.act("sendTurnState");
   }
 
   joinGame(gameID) {
@@ -91,6 +99,11 @@ export default class {
     if (gameToConnect) {
       gameToConnect.addPlayer(this);
       this.game = gameToConnect;
+      this.changeState(this.game.getGamePhase());
+      this.act("sendGameState");
+      this.act("sendTurnState");
+    } else {
+      this.receiveChat("комнаты с таким ID не существует", "server");
     }
   }
 
@@ -161,11 +174,6 @@ export default class {
     });
   }
 
-  sendRightsToMove() {
-    if (this.game.isActivePlayer(this)) this.send("yourTurn");
-    else this.send("wait");
-  }
-
   actions = {
     outOfGame: {
       sendOpenGamesList: (payload) => {
@@ -175,12 +183,10 @@ export default class {
         console.log("starting new game");
         const gameID = this.server.createNewGame(this);
         this.joinGame(gameID);
-        this.changeState("inLobby");
       },
       join: (payload) => {
         console.log("joining");
         this.joinGame(payload.gameID);
-        this.changeState("inLobby");
       },
       rename: (payload) => {
         this.rename(payload.userName);
@@ -206,7 +212,7 @@ export default class {
         } else this.receiveChat("сторона недоступна", "server");
       },
       startMatch: (payload) => {
-        this.game.startMatch();
+        this.game.startMatch(payload);
       },
       chat: (payload) => {
         this.sendChat(payload.message);
@@ -219,7 +225,15 @@ export default class {
     },
 
     inGame: {
-      getGameState: () => {
+      sendTurnState: () => {
+        const turnState = {
+          activePlayer: this.game.activePlayer.getName(),
+          activeSide: this.game.activePlayer.getSide(),
+          isYourTurn: this.isYourTurn(),
+        };
+        this.send("turnState", turnState);
+      },
+      sendGameState: () => {
         this.send("gameState", this.game.getLastGameState());
       },
       win: (payload) => {},
@@ -238,15 +252,15 @@ export default class {
       },
     },
 
-    // inGameSpectating: {
-    //   surrender: (payload) => {},
-    //   chat: (payload) => {
-    //     this.sendChat(payload.message);
-    //   },
-    //   disconnect: (payload) => {
-    //     this.changeConnectionStatus("offline");
-    //     // оповестить игроков о потере соединения
-    //   },
-    // },
+    onResultScreen: {
+      surrender: (payload) => {},
+      chat: (payload) => {
+        this.sendChat(payload.message);
+      },
+      disconnect: (payload) => {
+        this.changeConnectionStatus("offline");
+        // оповестить игроков о потере соединения
+      },
+    },
   };
 }
