@@ -42,7 +42,8 @@ export default class {
     return userID in this.users;
   }
 
-  createUser(connection, { userName }) {
+  createUser(connection, payload) {
+    const userName = payload ? payload.userName : "Anon";
     const newUser = new User(connection, userName, this);
     const userID = newUser.getID();
     this.users[userID] = newUser;

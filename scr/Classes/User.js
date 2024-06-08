@@ -159,8 +159,12 @@ export default class {
     clearTimeout(this.disconnectionTimer);
     this.connection = connection;
     this.connection.on("message", (data) => {
-      const { action, payload } = parseMessage(data);
-      this.act(action, payload);
+      try {
+        const { action, payload } = parseMessage(data);
+        this.act(action, payload);
+      } catch (err) {
+        sendError(this.connection, err);
+      }
     });
 
     this.connection.on("close", (data) => {
@@ -177,7 +181,7 @@ export default class {
   actions = {
     outOfGame: {
       sendOpenGamesList: (payload) => {
-        this.send("roomsList", this.server.getOpenGamesList());
+        this.send("roomsList", { list: this.server.getOpenGamesList() });
       },
       createGame: (payload) => {
         console.log("starting new game");
