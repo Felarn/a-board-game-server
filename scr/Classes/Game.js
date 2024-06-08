@@ -38,7 +38,10 @@ export default class {
 
   changeGamePhase(newPhase) {
     this.gamePhase = newPhase;
+    this.server.updateOpenGamesList();
+    this.players.forEach((player) => player.changeState(this.getGamePhase()));
   }
+
   getGamePhase() {
     return this.gamePhase;
   }
@@ -48,7 +51,6 @@ export default class {
       this.gameHistory.push(payload);
       this.activePlayer = this.white;
       this.changeGamePhase("inGame");
-      this.players.forEach((player) => player.changeState(this.getGamePhase()));
       this.actEveryone("sendGameState");
       this.actEveryone("sendTurnState");
     } else {
@@ -73,7 +75,10 @@ export default class {
   }
 
   isOpen() {
-    return this.openGame;
+    return (
+      this.openGame &&
+      (this.gamePhase === "inLobby" || this.gamePhase === "inGame")
+    );
   }
 
   getPlayerInfoList() {
@@ -94,8 +99,16 @@ export default class {
 
   removePlayer(user) {
     this.players = this.players.filter((player) => player !== user);
-    if (this.getPlayerCount() === 0) this.server.deleteGame(this.getID());
+    user.game.informEveryone(`Игрок ${user.getName()} покинул в комнату`);
+    user.game = null;
+    user.setSide("spectator");
+    if (this.getPlayerCount() === 0 && this.gamePhase === "inLobby")
+      this.server.deleteGame(this.getID());
     // this.server.updateOpenGamesList();
+  }
+
+  kickEveryoneToLobby() {
+    this.players.forEach((player) => this.removePlayer(player));
   }
 
   printInfo() {
@@ -121,6 +134,40 @@ export default class {
     this.activePlayer === this.white
       ? (this.activePlayer = this.black)
       : (this.activePlayer = this.white);
+  }
+
+  getOtherPlayer(playerOne) {
+    if (playerOne === this.white) return this.black;
+    if (playerOne === this.black) return this.white;
+  }
+
+  finisGame({
+    isDraw,
+    winner = null,
+    looser = null,
+    reason = "for no reason",
+  }) {
+    if (!isDraw) {
+      if (winner) looser = this.getOtherPlayer(winner);
+      if (looser) winner = this.getOtherPlayer(looser);
+    }
+    this.changeGamePhase("onResultScreen");
+    this.players.forEach((player) => {
+      player.game = null;
+      player.setSide("spectator");
+      let result = isDraw ? "draw" : "score";
+      if (player === winner) result = "youWon";
+      if (player === looser) result = "youLoose";
+
+      player.send("gameEnded", {
+        result,
+        winnerName: winner && winner.getName(),
+        looserName: looser && looser.getName(),
+        reason,
+      });
+    });
+    this.players = [];
+    this.changeGamePhase("gameEnded");
   }
 
   isActivePlayer(player) {

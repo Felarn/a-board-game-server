@@ -1,3 +1,5 @@
 export default (connection, action, payload = null) => {
-  connection.send(JSON.stringify({ action, payload }));
+  const stringToSend = JSON.stringify({ action, payload });
+  // console.log(stringToSend);
+  connection.send(stringToSend);
 };

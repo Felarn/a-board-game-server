@@ -16,6 +16,7 @@ export default class {
     this.bindConnection(connection);
     this.userRegistered();
     this.side = "spectator";
+    this.drawProposalOnCooldown = false;
 
     console.log(this.userID + " created");
   }
@@ -110,9 +111,7 @@ export default class {
   leaveGame(gameID) {
     if (this.game === null)
       throw new Error("Can't leave. Not currently in the game");
-    this.game.informEveryone(`Игрок ${this.getName()} покинул в комнату`);
     this.game.removePlayer(this);
-    this.game = null;
   }
 
   rename(newName) {
@@ -240,13 +239,33 @@ export default class {
       sendGameState: () => {
         this.send("gameState", this.game.getLastGameState());
       },
-      win: (payload) => {},
-      draw: (payload) => {},
+      finishGame: ({ result, reason }) => {
+        switch (result) {
+          case "win":
+            this.game.finisGame({ winner: this, isDraw: false, reason });
+            break;
+          case "loss":
+            this.game.finisGame({ looser: this, isDraw: false, reason });
+            break;
+          case "draw":
+            this.game.finisGame({ isDraw: true, reason });
+            break;
+
+          default:
+            break;
+        }
+      },
+      proposeDraw: (payload) => {
+        if (this.drawProposalOnCooldown) return;
+        this.drawProposalOnCooldown = true;
+        setTimeout(() => (this.drawProposalOnCooldown = false), 30000);
+        this.game.getOtherPlayer(this).send("drawProposal");
+      },
+      // proposeDraw: (payload) => {},
       makeTurn: (payload) => {
         if (this.game.isActivePlayer(this)) this.game.turn(payload);
         else this.receiveChat("не твой ход", "server");
       },
-      surrender: (payload) => {},
       chat: (payload) => {
         this.sendChat(payload.message);
       },
@@ -257,7 +276,9 @@ export default class {
     },
 
     onResultScreen: {
-      surrender: (payload) => {},
+      leave: () => {
+        this.changeState("outOfGame");
+      },
       chat: (payload) => {
         this.sendChat(payload.message);
       },

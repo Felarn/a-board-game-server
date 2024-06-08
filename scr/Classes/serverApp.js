@@ -42,6 +42,10 @@ export default class {
     return userID in this.users;
   }
 
+  isGameExist(gameID) {
+    return gameID in this.games;
+  }
+
   createUser(connection, payload) {
     const userName = payload ? payload.userName : "Anon";
     const newUser = new User(connection, userName, this);
@@ -65,7 +69,7 @@ export default class {
   }
 
   deleteGame(gameID) {
-    delete this.games[gameID];
+    if (this.isGameExist(gameID)) delete this.games[gameID];
     this.printGames();
   }
 
