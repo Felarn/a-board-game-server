@@ -260,7 +260,7 @@ export default class {
     this.players = [];
     this.changeGamePhase("gameEnded");
 
-    this.server.deleteGame(this); // Если понадобятся реплеи, комнату нужно оставить, не удалять
+    this.server.deleteGame(this.getID()); // Если понадобятся реплеи, комнату нужно оставить, не удалять
   }
 
   isActivePlayer(player) {
