@@ -1,7 +1,16 @@
 import { v4 as generateID } from "uuid";
+import Countdown from "./ExclusiveCountdown.js";
 // import sendError from "../utils/sendError.js";
 export default class {
-  constructor(server, host, gameName = `${host.getName()}\`s board`) {
+  constructor(
+    server,
+    host,
+    gameName = `${host.getName()}\`s board`,
+    terminationTimerSettings = {
+      proposeWin: { totalDuration: 30000, reminderInterval: 10000 },
+      terminate: { totalDuration: 40000, reminderInterval: 5000 },
+    }
+  ) {
     this.server = server;
     this.players = [];
     this.host = host;
@@ -15,6 +24,7 @@ export default class {
     this.spectator = null; // заглушка для единообразия, обращений к ней быть не должно
     this.activePlayer = null;
     this.gamePhase = "inLobby";
+    this.terminationCountdown = new Countdown(terminationTimerSettings);
   }
 
   actEveryone(action) {
@@ -29,10 +39,10 @@ export default class {
     this[player.getSide()] = null;
     this[side] = player;
     player.setSide(side);
-    this.updateLobbyState();
+    this.updatePartisipantsInfo();
   }
 
-  updateLobbyState() {
+  updatePartisipantsInfo() {
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
   }
 
@@ -54,7 +64,7 @@ export default class {
       this.actEveryone("sendGameState");
       this.actEveryone("sendTurnState");
     } else {
-      this.informEveryone("нужно 2 игрока");
+      this.informEveryone("для запуска игры необходимо 2 игрока");
     }
   }
 
@@ -130,6 +140,87 @@ export default class {
     return this.gameName;
   }
 
+  getOnlinePlayers() {
+    const playersOnline = [];
+    if (this.white.getConnectionStatus() === "online")
+      playersOnline.push(this.white);
+    if (this.black.getConnectionStatus() === "online")
+      playersOnline.push(this.black);
+    return playersOnline;
+  }
+
+  terminateGame() {
+    this.finisGame({
+      isDraw: true,
+      reason: "оба игрока находились оффлай слишком долго",
+    });
+  }
+  proposeWin(winner) {
+    winner.send("winProposal", { ableToDeclareWin: true });
+  }
+
+  mangeAbandonedRoom() {
+    if (this.getGamePhase() !== "inGame") return;
+    const playersOnline = this.getOnlinePlayers();
+    switch (playersOnline.length) {
+      case 2:
+        if (this.terminationCountdown.isActive()) {
+          this.terminationCountdown.stop();
+          this.informEveryone("оба игрока подключены, игра продолжается");
+        }
+        playersOnline.forEach((player) =>
+          player.send("winProposal", { ableToDeclareWin: false })
+        );
+        return;
+
+      case 1:
+        const winReminder = () => {
+          const timeLeft = Math.round(
+            this.terminationCountdown.getRemainingDuration() / 1000
+          );
+          this.informEveryone(
+            `Если ${this.getOtherPlayer(
+              playersOnline[0]
+            ).getName()} не восстановит подключение в течение ${
+              timeLeft
+            }сек., ${playersOnline[0].getName()} сможет объявить свою победу`
+          );
+        };
+
+        this.terminationCountdown.start(
+          "proposeWin",
+          () => this.proposeWin(playersOnline[0]),
+          winReminder,
+          winReminder
+        );
+
+        break;
+
+      case 0:
+        const terminationReminder = () => {
+          const timeLeft = Math.round(
+            this.terminationCountdown.getRemainingDuration() / 1000
+          );
+          this.informEveryone(
+            `Если хотя бы один игрок не подключится в течение ${
+              timeLeft
+            }сек., игра принудительно завершится ничьей`
+          );
+        };
+
+        this.terminationCountdown.start(
+          "terminate",
+          () => this.terminateGame(),
+          terminationReminder,
+          terminationReminder
+        );
+        break;
+
+      default:
+        break;
+    }
+  }
+
   toggleActivePlayer() {
     this.activePlayer === this.white
       ? (this.activePlayer = this.black)
@@ -168,6 +259,8 @@ export default class {
     });
     this.players = [];
     this.changeGamePhase("gameEnded");
+
+    this.server.deleteGame(this); // Если понадобятся реплеи, комнату нужно оставить, не удалять
   }
 
   isActivePlayer(player) {

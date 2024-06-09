@@ -112,6 +112,7 @@ export default class {
     if (this.game === null)
       throw new Error("Can't leave. Not currently in the game");
     this.game.removePlayer(this);
+    this.changeState("outOfGame");
   }
 
   rename(newName) {
@@ -135,6 +136,13 @@ export default class {
   changeConnectionStatus(newStatus) {
     this.connectionStatus = newStatus;
     if (newStatus === "offline") this.connection = null;
+    if (this.game !== null) {
+      this.game.informEveryone(
+        `${this.getName()} теперь ${this.getConnectionStatus()}`
+      );
+      this.game.updatePartisipantsInfo();
+      this.game.mangeAbandonedRoom();
+    }
   }
 
   act(action, payload = null) {
@@ -222,7 +230,7 @@ export default class {
       },
       disconnect: (payload) => {
         this.leaveGame();
-        this.changeState("outOfGame");
+
         this.changeConnectionStatus("offline");
       },
     },
