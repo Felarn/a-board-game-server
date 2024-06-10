@@ -192,7 +192,12 @@ export default class {
       },
       createGame: (payload) => {
         console.log("starting new game");
-        const gameID = this.server.createNewGame(this);
+        const gameID = this.server.createNewGame(
+          this,
+          payload && payload.gameName.trim()
+            ? payload.gameName.trim()
+            : `${this.getName()}\`s board`
+        );
         this.joinGame(gameID);
       },
       join: (payload) => {
@@ -212,7 +217,13 @@ export default class {
       rename: (payload) => {
         this.rename(payload.userName);
       },
-      renameGame: (payload) => {},
+      renameGame: (payload) => {
+        this.game.renameGame(
+          payload && payload.newGameName.trim()
+            ? payload.newGameName.trim()
+            : `${this.getName()}\`s board`
+        );
+      },
       leave: (payload) => {
         this.leaveGame();
         this.changeState("outOfGame");

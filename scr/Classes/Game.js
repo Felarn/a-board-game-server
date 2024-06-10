@@ -5,7 +5,7 @@ export default class {
   constructor(
     server,
     host,
-    gameName = `${host.getName()}\`s board`,
+    gameName,
     terminationTimerSettings = {
       proposeWin: { totalDuration: 20000, reminderInterval: 5000 },
       terminate: { totalDuration: 30000, reminderInterval: 3000 },
@@ -25,6 +25,12 @@ export default class {
     this.activePlayer = null;
     this.gamePhase = "inLobby";
     this.terminationCountdown = new Countdown(terminationTimerSettings);
+  }
+
+  renameGame(newName) {
+    this.gameName = newName;
+    this.updatePartisipantsInfo();
+    this.server.updateOpenGamesList();
   }
 
   actEveryone(action) {
@@ -52,6 +58,7 @@ export default class {
         playerList,
         whitePlayerName: this.white ? this.white.getName() : "",
         blackPlayerName: this.black ? this.black.getName() : "",
+        gameName: this.gameName,
       });
     });
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)

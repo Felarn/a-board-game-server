@@ -60,8 +60,8 @@ export default class {
     this.printUsers();
   }
 
-  createNewGame(host) {
-    const newGame = new Game(this, host);
+  createNewGame(host, gameName) {
+    const newGame = new Game(this, host, gameName);
     const gameID = newGame.getID();
     this.games[gameID] = newGame;
     // this.printGames();
