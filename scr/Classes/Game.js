@@ -7,8 +7,8 @@ export default class {
     host,
     gameName = `${host.getName()}\`s board`,
     terminationTimerSettings = {
-      proposeWin: { totalDuration: 30000, reminderInterval: 10000 },
-      terminate: { totalDuration: 40000, reminderInterval: 5000 },
+      proposeWin: { totalDuration: 20000, reminderInterval: 5000 },
+      terminate: { totalDuration: 30000, reminderInterval: 3000 },
     }
   ) {
     this.server = server;
@@ -43,6 +43,17 @@ export default class {
   }
 
   updatePartisipantsInfo() {
+    this.players.forEach((player) => {
+      console.log("==================================vvvvvvvvvv");
+      const playerList = this.getPlayerInfoList();
+      console.log(playerList);
+
+      player.send("playerList", {
+        playerList,
+        whitePlayerName: this.white ? this.white.getName() : "",
+        blackPlayerName: this.black ? this.black.getName() : "",
+      });
+    });
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
   }
 
@@ -105,6 +116,7 @@ export default class {
     );
     this.server.printGames();
     this.server.updateOpenGamesList();
+    this.updatePartisipantsInfo();
   }
 
   removePlayer(user) {
@@ -115,6 +127,7 @@ export default class {
     if (this.getPlayerCount() === 0 && this.gamePhase === "inLobby")
       this.server.deleteGame(this.getID());
     // this.server.updateOpenGamesList();
+    this.updatePartisipantsInfo();
   }
 
   kickEveryoneToLobby() {
@@ -135,6 +148,10 @@ export default class {
   sendChatToEveryone(message, from) {
     this.players.forEach((player) => player.receiveChat(message, from));
   }
+
+  // sendToEveryone(message, from) {
+  //   this.players.forEach((player) => player.receiveChat(message, from));
+  // }
 
   getGameName() {
     return this.gameName;

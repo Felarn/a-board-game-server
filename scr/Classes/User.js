@@ -176,12 +176,12 @@ export default class {
 
     this.connection.on("close", (data) => {
       console.log("connection closed with " + this.getID());
-      this.disconnectionTimer = setTimeout(() => this.act("disconnect"), 2000);
+      this.disconnectionTimer = setTimeout(() => this.act("disconnect"), 1000);
     });
 
     this.connection.on("error", (data) => {
       console.log("connection lost with " + this.getID());
-      this.disconnectionTimer = setTimeout(() => this.act("disconnect"), 2000);
+      this.disconnectionTimer = setTimeout(() => this.act("disconnect"), 1000);
     });
   }
 
