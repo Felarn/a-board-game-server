@@ -59,6 +59,7 @@ export default class {
         whitePlayerName: this.white ? this.white.getName() : "",
         blackPlayerName: this.black ? this.black.getName() : "",
         gameName: this.gameName,
+        gameID: this.gameID,
       });
     });
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
@@ -273,13 +274,13 @@ export default class {
       let result = isDraw ? "draw" : "score";
       if (player === winner) result = "youWon";
       if (player === looser) result = "youLoose";
-
-      player.send("gameEnded", {
+      player.rememberResult({
         result,
         winnerName: winner && winner.getName(),
         looserName: looser && looser.getName(),
         reason,
       });
+      player.act("gameEnded");
     });
     this.players = [];
     this.changeGamePhase("gameEnded");

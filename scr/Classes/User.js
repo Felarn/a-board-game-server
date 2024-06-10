@@ -17,7 +17,7 @@ export default class {
     this.userRegistered();
     this.side = "spectator";
     this.drawProposalOnCooldown = false;
-
+    this.latestGameResult = null;
     console.log(this.userID + " created");
   }
 
@@ -115,6 +115,14 @@ export default class {
     this.changeState("outOfGame");
   }
 
+  rememberResult(result) {
+    this.latestGameResult = result;
+  }
+
+  forgetResult() {
+    this.latestGameResult = null;
+  }
+
   rename(newName) {
     this.userName = newName;
   }
@@ -143,6 +151,7 @@ export default class {
       this.game.updatePartisipantsInfo();
       this.game.mangeAbandonedRoom();
     }
+    this.act("gameEnded");
   }
 
   act(action, payload = null) {
@@ -297,6 +306,11 @@ export default class {
     onResultScreen: {
       leave: () => {
         this.changeState("outOfGame");
+        this.forgetResult();
+      },
+
+      gameEnded: () => {
+        this.send("gameEnded", this.latestGameResult);
       },
       chat: (payload) => {
         this.sendChat(payload.message);
