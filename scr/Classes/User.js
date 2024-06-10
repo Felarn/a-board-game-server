@@ -226,6 +226,9 @@ export default class {
       rename: (payload) => {
         this.rename(payload.userName);
       },
+      switcGamePrivacy: ({ isPrivate }) => {
+        this.game.setPrivacy(isPrivate);
+      },
       renameGame: (payload) => {
         this.game.renameGame(
           payload && payload.newGameName.trim()

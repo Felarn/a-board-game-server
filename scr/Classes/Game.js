@@ -17,7 +17,7 @@ export default class {
     // this.gameID = crypto.randomUUID();
     this.gameID = generateID();
     this.gameName = gameName;
-    this.openGame = true;
+    this.openGame = false;
     this.gameHistory = [];
     this.black = null;
     this.white = null;
@@ -25,6 +25,11 @@ export default class {
     this.activePlayer = null;
     this.gamePhase = "inLobby";
     this.terminationCountdown = new Countdown(terminationTimerSettings);
+  }
+
+  setPrivacy(isPrivate) {
+    this.openGame = !isPrivate;
+    this.server.updateOpenGamesList();
   }
 
   renameGame(newName) {
@@ -60,6 +65,7 @@ export default class {
         blackPlayerName: this.black ? this.black.getName() : "",
         gameName: this.gameName,
         gameID: this.gameID,
+        isPrivate: !this.isOpen(),
       });
     });
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
