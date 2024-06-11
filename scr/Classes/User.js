@@ -94,13 +94,14 @@ export default class {
 
   joinGame(gameID) {
     console.log("gameID:" + gameID);
+
     const gameToConnect = this.server.games[gameID];
     console.log("aaalll of the games:    ===================");
     console.log(this.server.games);
     if (gameToConnect) {
+      this.changeState(gameToConnect.getGamePhase());
       gameToConnect.addPlayer(this);
       this.game = gameToConnect;
-      this.changeState(this.game.getGamePhase());
       this.act("sendGameState");
       this.act("sendTurnState");
     } else {

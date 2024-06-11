@@ -17,7 +17,7 @@ export default class {
     // this.gameID = crypto.randomUUID();
     this.gameID = generateID();
     this.gameName = gameName;
-    this.openGame = false;
+    this.openGame = true;
     this.gameHistory = [];
     this.black = null;
     this.white = null;
@@ -124,14 +124,16 @@ export default class {
 
   addPlayer(user) {
     this.players.push(user);
+
     this.informEveryone(`Игрок ${user.getName()} вошёл в комнату`);
     user.receiveChat(
       `Вы присоединилсь к комнате "${this.getGameName()}", ID: (${this.getID()})"`,
       "Server"
     );
-    this.server.printGames();
-    this.server.updateOpenGamesList();
+    user.setSide("spectator");
+    // this.server.printGames();
     this.updatePartisipantsInfo();
+    this.server.updateOpenGamesList();
   }
 
   removePlayer(user) {
