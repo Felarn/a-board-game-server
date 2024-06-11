@@ -205,10 +205,22 @@ paylpad: { newGameName: строка }}
 paylpad: { isPrivate: true/false }}
 ```
 
-### Переименование комнаты
+### начало матча:
 ```js
-{action:
-paylpad: }
+{action:"startMatch"
+paylpad: { начальная позиция, узнать актуальный формат}}
+```
+все находящиеся в комнате получать опове
+```js
+action: newUserCondition
+payload: {"userCondition":"inGame"}
+```
+
+
+### начало матча:
+```js
+{action:"startMatch"
+paylpad: { начальная позиция, узнать актуальный формат}}
 ```
 
 ### Переименование комнаты
@@ -217,10 +229,14 @@ paylpad: }
 paylpad: }
 ```
 
+### Переименование комнаты
+```js
+{action:
+paylpad: }
+```
 
-Alexander, [11.06.2024 0:27]
-начало матча:
- "startMatch", { узнай у сани начальный пейлоад }
+
+ , 
 
 ## сообщения от сервера
 
