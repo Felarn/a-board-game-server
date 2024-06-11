@@ -116,16 +116,53 @@ WIP
 {action:"chat",payload:{message:"Hello",from:"%имя отправителя%"}}
 ```
 
+### Создание новой комнаты 
+```
+{action: "createGame", payload: { gameID: gameID }}
+```
+в ответ придет 4 сообщения:
+изменение состояния пользователя на "в лобби"
+```js
+action: newUserCondition
+payload: {"userCondition":"inLobby"}
+```
+оповещение в чат, от сервера, о том, что игрок подключился к лобби
+```js
+{action:"chat",
+payload:{
+  message:"Вы присоединилсь к комнате \"название комнаты\",
+  ID: (1afb5484-26ee-4f45-9ab7-2933173f5e5d)\"",
+  from:"Server"
+}}
+```
+сторона, выбранная в данный момент пользователем, по умолчанию "spectator"
+```js
+action: yourSide
+payload: {"side":"spectator"}
+```
+информация о комнате:
+```js
+action: playerList
+payload: {"playerList":[
+  {"userName":"Имя игрока 1;","side":"spectator","connectionStatus":"online"},
+  {"userName":"Имя игрока 2;","side":"spectator","connectionStatus":"online"},
+  ...
+  {"userName":"Имя игрока n;","side":"spectator","connectionStatus":"online"},
+  ],
+"whitePlayerName":"",  // имя игрока, выбравшего в данный момент белых
+"blackPlayerName":"",  // имя игрока, выбравшего в данный момент черных
+"gameName":"название коматы",
+"gameID":"1afb5484-26ee-4f45-9ab7-2933173f5e5d", // ID комнаты, необходимый для подключения
+"isPrivate":true      // флаг, true = "закрытая игра", false = "открытая игра" 
+}
+```
+Блок с информацией о комнате будет при ходить снова при изменении любого из этих свойств.
 
 ### Вход в комнату 
 ```js
-{action: "join", payload: { gameID: gameID }}
+{action: "join", payload: { gameName: 'название игры' }}
 ```
-от сервера прийдет 
-```js
-{action: "newUserCondition", payload: { userCondition: "inLobby" }}
-```
-Позже добавлю, что вместе с этим прилетит второе сообщение с содержимым комнаты (игроки, ID, название комнаты)
+ответ от сервера идентичен тому, что приходит при создании комнаты
 
 ### Выход из комнаты 
 ```js
@@ -135,6 +172,7 @@ WIP
 ```js
 {action: "newUserCondition", payload: { userCondition: "outOfGame" }}
 ```
+
 
 ## сообщения от сервера
 
