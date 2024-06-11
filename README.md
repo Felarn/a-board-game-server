@@ -164,6 +164,31 @@ payload: {"playerList":[
 ```
 ответ от сервера идентичен тому, что приходит при создании комнаты
 
+### выбор стороны
+```
+action: "pickSide", payload: { side: 'строка black/white/spectator' }
+```
+в ответ придут описнные выше события yourSide и playerList
+
+### Переименование комнаты
+```js
+{action:"renameGame",
+paylpad: { newGameName: строка }}
+```
+ответ - событие playerList
+
+### Переключение открытой/закрытой игры
+```js
+{action:"switcGamePrivacy", 
+paylpad: { isPrivate: true/false }}
+```
+
+### Переименование комнаты
+```js
+{action:
+paylpad: }
+```
+
 ### Выход из комнаты 
 ```js
 {action: "leave", payload: null} или просто {action: "leave"}
@@ -172,11 +197,7 @@ payload: {"playerList":[
 ```js
 {action: "newUserCondition", payload: { userCondition: "outOfGame" }}
 ```
-### выбор стороны
-```
-action: "pickSide", payload: { side: 'строка black/white/spectator' }
-```
-в ответ придут описнные выше события yourSide и playerList
+
 
 ## сообщения от сервера
 
