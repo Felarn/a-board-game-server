@@ -168,6 +168,16 @@ payload: {"playerList":[
 ```
 ответ от сервера идентичен тому, что приходит при создании комнаты
 
+### Выход из комнаты 
+```js
+{action: "leave", payload: null} или просто {action: "leave"}
+```
+в ответ сервер пришлет 
+```js
+{action: "newUserCondition", payload: { userCondition: "outOfGame" }}
+```
+а также спискок открытых комнат "roomsList"
+
 ### выбор стороны
 ```
 action: "pickSide", payload: { side: 'строка black/white/spectator' }
@@ -207,16 +217,10 @@ paylpad: }
 paylpad: }
 ```
 
-### Выход из комнаты 
-```js
-{action: "leave", payload: null} или просто {action: "leave"}
-```
-в ответ сервер пришлет 
-```js
-{action: "newUserCondition", payload: { userCondition: "outOfGame" }}
-```
-а также спискок открытых комнат "roomsList"
 
+Alexander, [11.06.2024 0:27]
+начало матча:
+ "startMatch", { узнай у сани начальный пейлоад }
 
 ## сообщения от сервера
 
