@@ -109,11 +109,14 @@ WIP
 ### Чат
 возможна отправка сообщений при состоянии игрока "inLobby" и "inGame"
 ```js
-{"action":"chat","payload":{"message":"Hello"}}
+{"action":"chat",
+"payload":{"message":"текст сообщения"}}
 ```
+
 все участники текущей игры получают сообщение
 ```js
-{action:"chat",payload:{message:"Hello",from:"%имя отправителя%"}}
+{action:"chat",
+payload:{message:"текст сообщения",from:"%имя отправителя%"}}
 ```
 
 ### Создание новой комнаты 
@@ -158,9 +161,9 @@ payload: {"playerList":[
 ```
 Блок с информацией о комнате будет приходить снова при изменении любого из этих свойств.
 
-### Вход в комнату 
+### Подключение к комнате 
 ```js
-{action: "join", payload: { gameName: 'название игры' }}
+{action:"join", payload: { gameID: UUID}}
 ```
 ответ от сервера идентичен тому, что приходит при создании комнаты
 
@@ -179,8 +182,14 @@ paylpad: { newGameName: строка }}
 
 ### Переключение открытой/закрытой игры
 ```js
-{action:"switcGamePrivacy", 
+{action: "switcGamePrivacy", 
 paylpad: { isPrivate: true/false }}
+```
+
+### Переименование комнаты
+```js
+{action:
+paylpad: }
 ```
 
 ### Переименование комнаты
