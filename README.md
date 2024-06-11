@@ -156,7 +156,7 @@ payload: {"playerList":[
 "isPrivate":true      // флаг, true = "закрытая игра", false = "открытая игра" 
 }
 ```
-Блок с информацией о комнате будет при ходить снова при изменении любого из этих свойств.
+Блок с информацией о комнате будет приходить снова при изменении любого из этих свойств.
 
 ### Вход в комнату 
 ```js
@@ -172,7 +172,11 @@ payload: {"playerList":[
 ```js
 {action: "newUserCondition", payload: { userCondition: "outOfGame" }}
 ```
-
+### выбор стороны
+```
+action: "pickSide", payload: { side: 'строка black/white/spectator' }
+```
+в ответ придут описнные выше события yourSide и playerList
 
 ## сообщения от сервера
 
