@@ -67,6 +67,7 @@ export default class {
         gameName: this.gameName,
         gameID: this.gameID,
         isPrivate: !this.isOpen(),
+        youAreHost: player===this.host
       });
     });
     // отправляет всем игрокам пакет со статусом лобби (ники, онлайн-офлайн статус, цвет игроков)
