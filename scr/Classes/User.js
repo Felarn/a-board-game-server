@@ -79,6 +79,10 @@ export default class {
     this.act("sendOpenGamesList");
   }
 
+  sendUserCondition(){
+    this.send("userCondition", { userCondition: this.state, });
+  }
+
   reattachConnection(connection) {
     this.bindConnection(connection);
     this.changeConnectionStatus("online");
@@ -286,7 +290,9 @@ export default class {
 
           default:
             break;
+            
         }
+        // this.sendUserCondition();
       },
       proposeDraw: (payload) => {
         if (this.drawProposalOnCooldown) return;
