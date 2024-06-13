@@ -188,6 +188,7 @@ export default class {
     this.finisGame({
       isDraw: true,
       reason: "оба игрока находились оффлай слишком долго",
+      fen:null
     });
   }
   proposeWin(winner) {
