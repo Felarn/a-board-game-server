@@ -305,8 +305,8 @@ export default class {
   turn(gameState) {
     this.gameHistory.push(gameState);
     this.toggleActivePlayer();
-    this.actEveryone("sendGameState");
     this.actEveryone("sendTurnState");
+    this.actEveryone("sendGameState");
   }
 
   getLastGameState() {
