@@ -64,7 +64,7 @@ export default class {
     const newGame = new Game(this, host, gameName);
     const gameID = newGame.getID();
     this.games[gameID] = newGame;
-    // this.printGames();
+    this.printGames();
     return gameID;
   }
 

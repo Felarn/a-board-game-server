@@ -75,7 +75,7 @@ export default class {
   }
 
   userRegistered() {
-    this.send("registered", { userID: this.userID });
+    this.send("registered", { userID: this.userID,       userCondition: this.state, });
     this.act("sendOpenGamesList");
   }
 
@@ -83,6 +83,7 @@ export default class {
     this.bindConnection(connection);
     this.changeConnectionStatus("online");
     this.send("identified", {
+      userID: this.userID,
       userName: this.userName,
       userCondition: this.state,
     });

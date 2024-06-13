@@ -30,7 +30,7 @@ wss.on("connection", (newConnection) => {
           serverApp.reconnectUser(payload.userID, newConnection);
         } else {
           newConnection.send(
-            JSON.stringify({ action: "error", payload: "wrongID" })
+            JSON.stringify({ action: "error", payload: {worningMessage: "wrongID"} })
           );
           serverApp.createUser(newConnection, payload);
         }
