@@ -87,8 +87,8 @@ export default class {
     if (this.black && this.white) {
       this.gameHistory.push(payload);
       this.activePlayer = this.white;
-      this.changeGamePhase("inGame");
       this.actEveryone("sendGameState");
+      this.changeGamePhase("inGame");
       this.actEveryone("sendTurnState");
     } else {
       this.informEveryone("для запуска игры необходимо 2 игрока");
