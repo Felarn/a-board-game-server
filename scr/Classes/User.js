@@ -131,7 +131,7 @@ export default class {
 
   rename(newName) {
     this.userName = newName;
-    this.send('yourName', {userName: this.userName})
+    // this.send('yourName', {userName: this.userName})
   }
 
   printInfo() {
