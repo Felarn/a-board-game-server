@@ -290,6 +290,7 @@ export default class {
         winnerName: winner && winner.getName(),
         looserName: looser && looser.getName(),
         reason,
+        fen:null
       });
       player.act("gameEnded");
     });
