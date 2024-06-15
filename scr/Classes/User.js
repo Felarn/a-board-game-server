@@ -314,7 +314,7 @@ export default class {
       },
       leave:()=>{
         if (this.getSide()==='spectator') 
-          this.changeState("outOfGame");
+          this.changeState("outOfGame")
         else this.receiveChat("Ни шагу назад!",'Server')
       }
     },
