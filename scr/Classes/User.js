@@ -313,6 +313,10 @@ export default class {
         this.changeConnectionStatus("offline");
         // оповестить игроков о потере соединения
       },
+      leave:()=>{
+        if (this.getSide()==='spectator') 
+          this.changeState("outOfGame");
+      }
     },
 
     onResultScreen: {
