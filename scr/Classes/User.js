@@ -291,7 +291,6 @@ export default class {
 
           default:
             break;
-            
         }
         // this.sendUserCondition();
       },
@@ -316,6 +315,7 @@ export default class {
       leave:()=>{
         if (this.getSide()==='spectator') 
           this.changeState("outOfGame");
+        else this.receiveChat("Ни шагу назад!",'Server')
       }
     },
 
