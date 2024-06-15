@@ -313,8 +313,7 @@ export default class {
         // оповестить игроков о потере соединения
       },
       leave:()=>{
-        if (this.getSide()==='spectator') 
-          this.changeState("outOfGame")
+        if (this.getSide()==='spectator') this.leaveGame();
         else this.receiveChat("Ни шагу назад!",'Server')
       }
     },
