@@ -54,11 +54,17 @@ export default class {
     return this.game.activePlayer === this;
   }
 
+  isHost(){
+    if (!this.game) return false;
+    return this.game.host === this;
+  }
+
   getPublicInfo() {
     return {
       userName: this.getName(),
       side: this.getSide(),
       connectionStatus: this.getConnectionStatus(),
+      isHost: this.isHost()
     };
   }
 
