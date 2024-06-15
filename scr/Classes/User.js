@@ -278,6 +278,7 @@ export default class {
         this.send("gameState", this.game.getLastGameState());
       },
       finishGame: ({ result, reason }) => {
+        if (this.getSide()==='spectator') return;
         switch (result) {
           case "win":
             this.game.finisGame({ winner: this, isDraw: false, reason });
@@ -295,6 +296,7 @@ export default class {
         // this.sendUserCondition();
       },
       proposeDraw: (payload) => {
+        if (this.getSide()==='spectator') return;
         if (this.drawProposalOnCooldown) return;
         this.drawProposalOnCooldown = true;
         setTimeout(() => (this.drawProposalOnCooldown = false), 30000);
@@ -302,6 +304,7 @@ export default class {
       },
       // proposeDraw: (payload) => {},
       makeTurn: (payload) => {
+        if (this.getSide()==='spectator') return;
         if (this.game.isActivePlayer(this)) this.game.turn(payload);
         else this.receiveChat("не твой ход", "server");
       },
