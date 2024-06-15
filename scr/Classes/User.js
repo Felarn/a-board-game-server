@@ -61,10 +61,10 @@ export default class {
 
   getPublicInfo() {
     return {
+      isHost: this.isHost(),
       userName: this.getName(),
       side: this.getSide(),
       connectionStatus: this.getConnectionStatus(),
-      isHost: this.isHost()
     };
   }
 
@@ -111,8 +111,8 @@ export default class {
     console.log(this.server.games);
     if (gameToConnect) {
       this.changeState(gameToConnect.getGamePhase());
-      gameToConnect.addPlayer(this);
       this.game = gameToConnect;
+      gameToConnect.addPlayer(this);
       this.act("sendGameState");
       this.act("sendTurnState");
     } else {
