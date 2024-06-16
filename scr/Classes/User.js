@@ -250,8 +250,8 @@ export default class {
         );
       },
       leave: (payload) => {
-        this.leaveGame();
         this.act('pickSide',{side:'spectator'})
+        this.leaveGame();
         this.changeState("outOfGame");
       },
       pickSide: ({ side }) => {
