@@ -243,6 +243,7 @@ export default class {
         this.game.setPrivacy(isPrivate);
       },
       renameGame: (payload) => {
+        if (!this.game) return this.receiveChat('Вы находитесь в игре', 'Server')
         this.game.renameGame(
           payload && payload.newGameName.trim()
             ? payload.newGameName.trim()
@@ -307,7 +308,7 @@ export default class {
         if (this.drawProposalOnCooldown) return;
         this.drawProposalOnCooldown = true;
         setTimeout(() => (this.drawProposalOnCooldown = false), 30000);
-        this.game.getOtherPlayer(this).send("drawProposal");
+        this.game.getOtherPlayer(this).send("drawProposal",{ableToDeclareDraw:true});
       },
       // proposeDraw: (payload) => {},
       makeTurn: (payload) => {
