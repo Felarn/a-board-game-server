@@ -309,7 +309,7 @@ export default class {
         this.drawProposalOnCooldown = true;
         setTimeout(() => (this.drawProposalOnCooldown = false), 30000);
         this.game.getOtherPlayer(this).send("drawProposal",{ableToDeclareDraw:true});
-        this.game.getOtherPlayer(this).sendMessage("chat",{message:'Предлагаю ничью!',from:this.getName()});
+        this.act("chat",{message:'Предлагаю ничью!',from:this.getName()});
       },
       // proposeDraw: (payload) => {},
       makeTurn: (payload) => {
