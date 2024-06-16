@@ -17,6 +17,7 @@ export default class {
     this.userRegistered();
     this.side = "spectator";
     this.drawProposalOnCooldown = false;
+    this.drawProposalCD = 30000;
     this.latestGameResult = null;
     console.log(this.userID + " created");
   }
@@ -305,9 +306,13 @@ export default class {
       },
       proposeDraw: (payload) => {
         if (this.getSide()==='spectator') return;
-        if (this.drawProposalOnCooldown) return;
+        if (this.drawProposalOnCooldown) {
+          const remainingCD = Math.round((this.drawProposalCD-(new Date()-this.lastProposal))/1000)
+          this.receiveChat(`Нельзя предложить ничью снова еще ${remainingCD}сек.`,'Server')
+          return};
+        this.lastProposal = new Date();
         this.drawProposalOnCooldown = true;
-        setTimeout(() => (this.drawProposalOnCooldown = false), 30000);
+        setTimeout(() => (this.drawProposalOnCooldown = false), this.drawProposalCD);
         this.game.getOtherPlayer(this).send("drawProposal",{ableToDeclareDraw:true});
         this.act("chat",{message:'Предлагаю ничью!',from:this.getName()});
       },
