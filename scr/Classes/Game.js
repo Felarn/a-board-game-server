@@ -287,6 +287,7 @@ export default class {
       // if (player === looser) result = "youLoose";
       player.rememberResult({
         result,
+        isDraw,
         isWinner:player === winner,
         isLooser:player === looser,
         winnerName: winner && winner.getName(),
