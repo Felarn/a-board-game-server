@@ -288,7 +288,9 @@ export default class {
       player.rememberResult({
         result,
         winnerName: winner && winner.getName(),
+        winnerSide: winner && winner.getSide(),
         looserName: looser && looser.getName(),
+        looserSide: looser && winner.getSide(),
         reason,
         fen:null
       });
