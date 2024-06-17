@@ -283,10 +283,12 @@ export default class {
       player.game = null;
       player.setSide("spectator");
       let result = isDraw ? "draw" : "score";
-      if (player === winner) result = "youWon";
-      if (player === looser) result = "youLoose";
+      // if (player === winner) result = "youWon";
+      // if (player === looser) result = "youLoose";
       player.rememberResult({
         result,
+        isWinner:player === winner,
+        isLooser:player === looser,
         winnerName: winner && winner.getName(),
         winnerSide: winner && winner.getSide(),
         looserName: looser && looser.getName(),
