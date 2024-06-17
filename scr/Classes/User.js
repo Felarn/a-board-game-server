@@ -180,7 +180,7 @@ export default class {
   changeState(newState) {
     if (newState in this.actions) {
       this.state = newState;
-      this.send("newUserCondition", { userCondition: this.state });
+      this.send("newUserCondition", { userCondition: this.state ,userName:this.userName});
       this.server.updateOpenGamesList();
     } else throw new Error(`State : ${newState} does not exist`);
   }

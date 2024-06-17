@@ -281,10 +281,10 @@ export default class {
     this.changeGamePhase("onResultScreen");
     this.players.forEach((player) => {
       player.game = null;
-      player.setSide("spectator");
       let result = isDraw ? "draw" : "score";
       // if (player === winner) result = "youWon";
       // if (player === looser) result = "youLoose";
+      console.log('winner'+winner.getSide(),)
       player.rememberResult({
         result,
         isDraw,
@@ -298,8 +298,10 @@ export default class {
         fen:null
       });
       player.act("gameEnded");
+      player.setSide("spectator");
     });
     this.players = [];
+    
     this.changeGamePhase("gameEnded");
 
     this.server.deleteGame(this.getID()); // Если понадобятся реплеи, комнату нужно оставить, не удалять
