@@ -282,9 +282,6 @@ export default class {
     this.players.forEach((player) => {
       player.game = null;
       let result = isDraw ? "draw" : "score";
-      // if (player === winner) result = "youWon";
-      // if (player === looser) result = "youLoose";
-      console.log('winner'+winner.getSide(),)
       player.rememberResult({
         result,
         isDraw,
