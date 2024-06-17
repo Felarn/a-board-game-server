@@ -298,8 +298,9 @@ export default class {
         fen:null
       });
       player.act("gameEnded");
-      player.setSide("spectator");
+
     });
+    this.players.forEach(player=>player.setSide("spectator"))
     this.players = [];
     
     this.changeGamePhase("gameEnded");
