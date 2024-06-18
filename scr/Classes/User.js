@@ -339,6 +339,7 @@ export default class {
       leave: () => {
         this.changeState("outOfGame");
         this.forgetResult();
+        this.setSide("spectator");
       },
 
       gameEnded: () => {
