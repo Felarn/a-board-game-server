@@ -292,7 +292,11 @@ export default class {
         looserName: looser && looser.getName(),
         looserSide: looser && winner.getSide(),
         reason,
-        fen:null
+        fen:null,
+        ...this.getLastGameState(),
+        ...this.getPlayerInfoList(),
+        isYourTurn: false,
+        // playerSide: player.getSide()
       });
       player.act("gameEnded");
 
