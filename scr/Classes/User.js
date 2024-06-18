@@ -328,7 +328,7 @@ export default class {
       },
       disconnect: (payload) => {
         this.changeConnectionStatus("offline");
-        this.leaveTimer = setTimeout(()=> this.act('leave'),2000);
+        this.leaveTimer = setTimeout(()=> this.act('leave'),120000);
         // оповестить игроков о потере соединения
       },
       leave:()=>{
