@@ -187,6 +187,7 @@ export default class {
 
   bindConnection(connection) {
     clearTimeout(this.disconnectionTimer);
+    clearTimeout(this.leaveTimer)
     this.connection = connection;
     this.connection.on("message", (data) => {
       try {
@@ -327,6 +328,7 @@ export default class {
       },
       disconnect: (payload) => {
         this.changeConnectionStatus("offline");
+        this.leaveTimer = setTimeout(()=> this.act('leave'),2000);
         // оповестить игроков о потере соединения
       },
       leave:()=>{
