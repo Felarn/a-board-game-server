@@ -296,12 +296,12 @@ export default class {
         ...this.getLastGameState(),
         playerList: this.getPlayerInfoList(),
         isYourTurn: false,
-        // playerSide: player.getSide()
+        side: player.getSide()
       });
       player.act("gameEnded");
 
     });
-    this.players.forEach(player=>player.setSide("spectator"))
+
     this.players = [];
     
     this.changeGamePhase("gameEnded");
