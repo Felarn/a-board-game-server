@@ -294,7 +294,7 @@ export default class {
         reason,
         fen:null,
         ...this.getLastGameState(),
-        ...this.getPlayerInfoList(),
+        playerList: this.getPlayerInfoList(),
         isYourTurn: false,
         // playerSide: player.getSide()
       });
